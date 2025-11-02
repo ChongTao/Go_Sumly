@@ -1,4 +1,4 @@
-io包为I/O源语提供基本的接口。io包中最重要的是两个接口：Reader和Writer接口
+Go 的 I/O 模型核心思想是：**一切输入输出都是流（stream），通过 Reader/Writer 抽象实现解耦。**
 
 # 1 Reader接口
 
@@ -10,7 +10,11 @@ type Reader interface {
 }
 ```
 
-Read 方法将读取的len(p)长度的数据制到字节数组p中 ，返回读取的字节数n（并不保证一定会读满整个p），并在读完的时候返回 io.EOF 到 err。
+- 从数据源中读取最多 `len(p)` 字节，存入 `p`；
+
+- 返回实际读取的字节数 `n`；
+
+- 若无数据可读返回 `io.EOF`。
 
 ```go
 // 可以从标准输入读取
@@ -23,6 +27,8 @@ data, err = ReadFrom(file, 9)
 data, err := ReadFrom(strings.NewReader("from string"), 12)
 ```
 
+实现者：`os.File`、`bytes.Buffer`、`net.Conn`、`strings.Reader` 等。
+
 # 2 Writer接口
 
 Writer接口的定义如下：
@@ -33,7 +39,9 @@ type Writer interface {
 }
 ```
 
-Writer将len(p)个字节从p中写入到基本数据流中，返回从p中被写入的字节数n以及任何遇到的引起写入提前停止错误。
+- 将 `p` 中的数据写入目标（文件、网络、内存等）；
+
+- 返回成功写入的字节数。
 
 在fmt库中，有一组函数：Fprintf/Fprint/Fprintln，它们接收一个 io.Wrtier 类型参数（第一个参数）
 

@@ -90,7 +90,7 @@ r.GET("/goindex", func(c *gin.Context) {
 })
 ```
 
-分组路径，
+- 分组路径
 
 ```go
 // group routes 分组路由
@@ -113,7 +113,7 @@ v2 := r.Group("/v2")
 }
 ```
 
-上传文件
+- 上传文件
 
 ```go
 	r.POST("/upload", func(c *gin.Context) {

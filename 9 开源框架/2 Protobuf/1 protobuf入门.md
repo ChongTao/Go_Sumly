@@ -130,3 +130,103 @@ service SearchService {
 }
 ```
 
+
+
+**Protobuf**（Protocol Buffers）是由谷歌（Google）开发的一种高效的结构化数据序列化工具。它是一种类似于 XML 或 JSON 的数据格式，但更加轻量和高效，广泛应用于数据存储、通信协议和分布式系统中。
+
+## Protobuf的工作原理 
+
+ 使用 `.proto` 文件定义数据的结构。例如，定义一个用户的信息：
+
+```ProtoBuf
+syntax = "proto3";  // 使用的版本
+
+package main;
+
+message User {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+}
+```
+
+ 使用 Protobuf 的编译器（`protoc`）将 `.proto` 文件编译为目标语言的代码。
+
+ 将数据序列化（转化成二进制格式）以便存储或传输；
+
+ 在接收端再将二进制数据反序列化回原始数据结构。
+
+protobuf最基本的单位是message，类似go的struct
+
+生成Go代码
+
+```Shell
+$ protoc --go_out=. hello.proto
+```
+
+其中 `go_out` 参数告知 protoc 编译器去加载对应的 protoc-gen-go 工具，然后通过该工具生成代码，生成代码放到当前目录。
+
+通过protobuf定义rpc服务
+
+```ProtoBuf
+service HelloService {
+    rpc Hello (String) returns (String);
+}
+```
+
+## 客户端调用 
+
+Go 语言的 RPC 库最简单的使用方式是通过 `Client.Call` 方法进行同步阻塞调用
+
+```Go
+func (client *Client) Call(serviceMethod string, args interface{}, reply interface{},) error {
+    call := <-client.Go(serviceMethod, args, reply, make(chan *Call, 1)).Done
+    return call.Error
+}
+```
+
+通过 `Client.Go` 方法进行一次异步调用，返回一个表示这次调用的 `Call` 结构体。然后等待 `Call` 结构体的 Done 管道返回调用结果。
+
+也可以通过`Client.Go`方法异步调用rpc服务
+
+```Go
+func doClientWork(client *rpc.Client) {
+    helloCall := client.Go("HelloService.Hello", "hello", new(string), nil)
+
+    // do some thing
+
+    helloCall = <-helloCall.Done
+    if err := helloCall.Error; err != nil {
+        log.Fatal(err)
+    }
+
+    args := helloCall.Args.(string)
+    reply := helloCall.Reply.(*string)
+    fmt.Println(args, *reply)
+}
+```
+
+在异步调用命令发出后，一般会执行其他的任务，因此异步调用的输入参数和返回值可以通过返回的 Call 变量进行获取。
+
+## gRPC 
+
+gRPC 是 Google 公司基于 Protobuf 开发的跨语言的开源 RPC 框架。gRPC 基于 HTTP/2 协议设计，可以基于一个 HTTP/2 连接提供多个服务，对于移动设备更加友好。
+
+在 Go 语言版本的 gRPC 中，**`grpc.NewClient`** 是推荐使用的客户端连接创建函数，用于替代传统的 `grpc.Dial`，它创建一个“虚拟连接” `ClientConn`，代表客户端与 gRPC 服务端之间的连接，该连接会在后台维护并自动重连，如下：
+
+```Go
+opts := []grpc.DialOption{
+    grpc.WithTransportCredentials(insecure.NewCredentials()),
+}
+
+conn, err := grpc.NewClient(address, opts...)
+if err != nil {
+    log.Fatalf("fail to dial: %v", err)
+}
+defer conn.Close()
+
+// 对应的rpc定义的服务客户端
+client := pb.NewRouteGuideClient(conn)
+```
+
+参考：https://chai2010.cn/advanced-go-programming-book/ch4-rpc/ch4-03-netrpc-hack.html
