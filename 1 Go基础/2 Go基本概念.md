@@ -616,6 +616,40 @@ func TestAdd(t *testing.T) {
 }
 ```
 
+## 6.1 TestMain
+
+在 Go 中，`TestMain` 是一个特殊命名的函数：
+
+```go
+func TestMain(m *testing.M)
+```
+
+如果某个测试包中定义了这个函数，当你执行 `go test` 时，**Go 不会直接运行 `TestXxx` 测试函数**，而是：
+
+1. 自动检测并调用 `TestMain`；
+2. 由 `TestMain` 调用 `m.Run()` 来执行所有测试；
+3. 最终由你自己决定如何退出（通常通过 `os.Exit(code)`）。
+
+```go
+func TestMain(m *testing.M) {
+    // 1️⃣ 全局初始化
+    fmt.Println(">>> 初始化测试环境")
+    setup()
+
+    // 2️⃣ 运行所有测试
+    code := m.Run()
+
+    // 3️⃣ 全局清理
+    fmt.Println(">>> 清理测试环境")
+    teardown()
+
+    // 4️⃣ 手动退出并返回状态码
+    os.Exit(code)
+}
+```
+
+> 单独执行某个测试用例，TestMain也会执行。
+
 # 7 包和模块
 
 ## 7.1 Package
