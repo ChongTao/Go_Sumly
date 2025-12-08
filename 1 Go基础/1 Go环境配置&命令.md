@@ -28,6 +28,7 @@ Goland下载：[Download GoLand: A Go IDE with extended support for JavaScript, 
 7. `go fmt/goimports`：格式化代码，统一风格
 8. `go doc`：查看包或者函数的文档。
 9. `go clean`：清理编译生成的临时文件、可执行文件等。
+10. `go clean -testcache`: 清理test的缓存
 
 
 
