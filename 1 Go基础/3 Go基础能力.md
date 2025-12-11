@@ -343,24 +343,3 @@ fmt.Println(u)  // {ID:10 Name:"" Age:30 Password:"" Score:0}
 ```
 
 > 字段首字母小写不生效，`encoding/json` 只能访问导出字段（首字母大写），如果不添加json字段，json字段名和struct结构体内字段原名一致。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
