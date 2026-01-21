@@ -68,3 +68,9 @@ select {
 }
 ```
 
+## 4.2 context使用
+
+1. Do not store Contexts inside a struct type; instead, pass a Context explicitly to each function that needs it. The Context should be the first parameter, typically named ctx.
+2. Do not pass a nil Context, even if a function permits it. Pass context.TODO if you are unsure about which Context to use.
+3. Use context Values only for request-scoped data that transits processes and APIs, not for passing optional parameters to functions.
+4. The same Context may be passed to functions running in different goroutines; Contexts are safe for simultaneous use by multiple goroutines.
