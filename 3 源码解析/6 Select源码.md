@@ -72,6 +72,5 @@ for i := range order {
     j := fastrandn(uint32(i + 1))
     order[i], order[j] = order[j], order[i]
 }
-
 ```
 
