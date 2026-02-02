@@ -1,3 +1,5 @@
+**Gin**是Go生态里**最流行的 HTTP Web 框架**之一，基于 `net/http`，高性能HTTP路由+中间件框架。
+
 # 1 Gin 特性
 
 - **快速**：路由不使用反射，基于Radix树，内存占用少。
@@ -121,5 +123,3 @@ v2 := r.Group("/v2")
 		c.String(http.StatusOK, file.Filename)
 	})
 ```
-
-# gin框架中间件分析
